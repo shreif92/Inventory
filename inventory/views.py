@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.urls import reverse_lazy
 from .models import *
 from .forms import *
 from .filters import *
@@ -13,19 +14,20 @@ class StocklistView(FilterView):
     queryset = Stock.objects.filter(is_deleted=False)
     filterset_class = StockFilter
     template_name = "inventory.html"
-    paginate_by = 10
+    context_object_name = "stocks"
+    paginate_by = 2
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['stocks'] = context['object_list']  # نقل البيانات إلى مفتاح جديد
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['stocks'] = context['object_list']  # نقل البيانات إلى مفتاح جديد
+    #     return context
 
 
 class CreateStock(SuccessMessageMixin,generic.CreateView):
     model = Stock
     form_class = StockForm
     template_name = "create_Stock.html"
-    success_url = "/"
+    success_url = reverse_lazy('stock_list')
     success_message = "Stock created successfully..."
 
 
@@ -33,6 +35,7 @@ class UpdateStock(SuccessMessageMixin,generic.UpdateView):
     model = Stock
     form_class = StockForm
     template_name = "edit_stock.html"
+    success_url = reverse_lazy('stock_list')
     success_message = "Stock Updated successfully..."
 
 
@@ -52,4 +55,4 @@ class DeleteStock(generic.View):
             stock.is_deleted = True
             stock.save()
             messages.success(request, self.success_message)
-        return redirect('Stocklist')
+        return redirect('stock_list')

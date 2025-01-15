@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 
 {% block title %}enventory{% endblock title %}
 
@@ -17,10 +18,11 @@
 
             <table class="table table-css table-bordered table-hover">
 
-
+            {% if stocks %}
               <form method="get">
                 <div class="input-group search">
-                  <input type="search" class="form-control textinput" placeholder="Search by stock name">
+                  {% comment %} <input type="search" class="form-control textinput" placeholder="Search by stock name"> {% endcomment %}
+                  {% render_field filter.form.name class="form-control textinput" placeholder="Search by stock name" %}
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-pink"> Search </button>
                   </div>
@@ -41,34 +43,41 @@
 
                 {% for stock in stocks  %}
                 <tr>
-                  <td><p>{{stock.name}}</p></td>
+                  <td><p>{{stock.name|title}}</p></td>
                   <td class="align-middle">{{stock.quantity}}</td>
                   <td class="align-middle">
                     <a href="{% url 'update_stock' stock.pk %}" class="btn btn-info btn-sm">Edit Details</a>
-                    <a href="#" class="btn btn-danger btn-sm"> Delete Stock </a>
+                    <a href="{% url 'delete_stock' stock.pk %}" class="btn btn-danger btn-sm"> Delete Stock </a>
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
-
             </table>
 
+            
             <div class="align-middle">
-              <a class="btn btn-outline-info mb-4" href="#">First</a>
-              <a class="btn btn-outline-info mb-4" href="#">Previous</a>
-              <a class="btn btn-info mb-4" href="#">1</a>
-              <a class="btn btn-outline-info mb-4" href="#">2</a>
-              <a class="btn btn-outline-info mb-4" href="#">Next</a>
-              <a class="btn btn-outline-info mb-4" href="#">Last</a>
+              {% if is_paginated %}
+                {% if page_obj.has_previous %}
+                  <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                  <a class="btn btn-outline-info mb-4" href="?page={page_obj.previous_page_number}">Previous</a>
+                {% endif %}
+                {% for page_num in page_obj.paginator.page_range %}
+                  {% if page_num == page_obj.number %}
+                    <a class="btn btn-info mb-4" href="#">{{ page_num }}</a>
+                  {% else %}
+                    <a class="btn btn-outline-info mb-4" href="?page={{ page_num }}">{{ page_num }}</a>
+                  {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                  <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+                  <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                {% endif %}
+              {% endif %}
             </div>
-
+            {% else %}
             <br><br><br><br><br><br><br><br>
-            <div style="color: #575757; font-style: bold; font-size: 1.5rem; text-align: center;">The records are empty.
-              Please try
-              adding some.</div>
+            <div style="color: #575757; font-style: bold; font-size: 1.5rem; text-align: center;">The records are empty.Please tryadding some.</div>
+            {% endif %}
 
-          </div>
-        </div>
-        <br>
 
 {% endblock content %}

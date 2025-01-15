@@ -50,6 +50,17 @@
               {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
               {% endfor %}
+              <script>
+                // استخدام JavaScript لإخفاء الرسائل بعد 5 ثوانٍ
+                setTimeout(() => {
+                  const messages = document.querySelectorAll('.alert');
+                  messages.forEach((message) => {
+                    message.style.transition = 'opacity 0.5s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 500); // يتم إزالة العنصر من DOM
+                  });
+                }, 5000); // بعد 5 ثوانٍ
+              </script>
             {% endif %}
           <div class="container">
             <!-- block content -->
